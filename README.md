@@ -40,7 +40,7 @@ Link to the RP2350:
 ## Install the SDK and other tools
 I will be using a Ubuntu PC as my development platform. However you can addapt the commands to you specific platform (windows, mac, etc.)
 
-Start by creating a directory called **pico2** on your home directory (~/pico2)
+Start by creating a directory called **pico2** on your home directory (~/pico2). Then install **pico-sdk** and **pico-examples**.
 ```
 mkdir ~/pico2
 cd ~/pico2
@@ -50,6 +50,20 @@ git submodule update --init
 cd ..
 git clone -b master https://github.com/raspberrypi/pico-examples.git
 ```
+## Build the picotool to generate the .uf2 files
+The .uf2 files are files used to flash the Pico board when it is mounted as hard drive on the PC. The .uf2 file is generated out of the .elf file.
+Previously, the ELF-to-UF2 conversion was handled by the elf2uf2 tool in the SDK. Now, for the Pico2 board, the SDK also uses picotool to hash and sign binaries.
+
+```
+cd ~/pico2
+git clone https://github.com/raspberrypi/picotool.git
+cd picotool
+mkdir build
+cd build
+cmake ..
+make -j
+```
+
 ## Clone the *RPi-Pico2-Baremetal* repository
 ```
 cd ~/pico2
