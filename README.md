@@ -35,7 +35,7 @@ Link to the PICO SDK reference:
 Link to the RP2350:
 [RP2350 Datasheet](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf)
 
-## How to install the SDK and other tools
+## ⚙️ Install the SDK and other tools
 I will be using a Ubuntu PC as my development platform. However you can addapt the commands to you specific platform (windows, mac, etc.)
 
 Start by creating a directory called **pico2** on your home directory (~/pico2)
