@@ -27,7 +27,9 @@ The RP2350 is the latest and greatest from the Raspberry Pi Foundation. It's pac
 This project is a work in progress, and we need your help to make it awesome! Feel free to reporting issues, or just sharing your thoughts.
 
 
-# Firt time installation of SDK
+
+
+# ⚙️ Firt time installation of SDK
 
 Link to the PICO SDK reference:
 [Raspberry Pi Pico C SDK](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf)
@@ -35,7 +37,7 @@ Link to the PICO SDK reference:
 Link to the RP2350:
 [RP2350 Datasheet](https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf)
 
-## ⚙️ Install the SDK and other tools
+## Install the SDK and other tools
 I will be using a Ubuntu PC as my development platform. However you can addapt the commands to you specific platform (windows, mac, etc.)
 
 Start by creating a directory called **pico2** on your home directory (~/pico2)
