@@ -19,9 +19,11 @@ void delay(unsigned int millisec)
     }
 }
 
-/* Main Function
-   Toggle GPIO25 on Pico 2 (on board LED) */
-int main() {
+/* ConfigDevice Function
+   Configures the clock and GPIO */
+void configDevice(void)
+{
+
     // Setup XOC clock to drive the GPIO (Pico2 board as a ABM8-272-T3 crystal that oscillates at 12MHz)
     (*(volatile unsigned int*)(0x40048000 + 0))      = ( 0x00000aa0);    //  XOC range 1-15MHz (Crystal Oschillator)
     (*(volatile unsigned int*)(0x40048000 + 0x0c))   = ( 0x000000c4);    //  Startup Delay (default = 50,000 cycles aprox.)
@@ -40,12 +42,17 @@ int main() {
 
     // Configure the pad control
     (*(volatile unsigned int*)(0x40038000 + WRITE_CLR + 0x68)) = (1 << 8);  // Remove the pad isolation (new on RP2350)
+}
 
+/* Main Function
+   Toggle GPIO25 on Pico 2 (on board LED) */
+int main() {
+    configDevice();
     while(1)
     {
         // Toggle SIO register to control GPIO25
         (*(volatile unsigned int*)(0xd0000000 + WRITE_SET + 0x028)) = 1 << 25; // xor GPIO (toggle pin)
-        delay(100);
+        delay(250);
     }
     return 0;
 }
