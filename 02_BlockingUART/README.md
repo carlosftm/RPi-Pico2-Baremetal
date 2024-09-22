@@ -1,7 +1,7 @@
 # 02_BlockingUART
 This example demonstrates how to configure the UART (Universal Asynchronous Receiver/Transmitter) on the RP2350 microcontroller by directly writing to its registers. 
 UART is crucial for debugging purposes because it allows developers to send and receive data between the microcontroller and a computer or other devices.
-This example uses the UART in blocking mode with FIFO enabled. That means, the microcontroller uses a FIFO to read and write data, but in case the FIFO is fool, then the microcontroller needs to wait for the status flags, blocking the microcontroller for other taks.
+This example uses the UART in blocking mode with FIFO enabled. That means, the microcontroller uses a FIFO to read and write data, but in case the FIFO is full, then the microcontroller needs to wait for the status flags, blocking the microcontroller for other taks.
 
 The UART0 is configured at 115200 bauds, 8 bits, parity none, 1 stop bit, no control flow. The GPIOs used are GPIO0 and GPIO1.
 
