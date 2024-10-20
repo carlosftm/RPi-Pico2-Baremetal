@@ -1,5 +1,9 @@
-// Copyright (c) 2024 CarlosFTM
-// This code is licensed under MIT license (see LICENSE.txt for details)
+/* Copyright (c) 2024 CarlosFTM
+   SPDX-License-Identifier: GPL-3.0-or-later
+   (see LICENSE.txt for details)
+*/
+
+#include <stdint.h>
 
 /* Define register access function
    To make the code more readable, we make use of these macros */
@@ -13,22 +17,97 @@
 #define WRITE_SET    (0x2000)   // atomic bitmask set on write
 #define WRITE_CLR    (0x3000)   // atomic bitmask clear on write
 
+/* Function declaration */
+int main( void );
+void Default_Handler(void);
+void Reset_Handler(void);
+
+/* Type definitions */
+typedef void(*vectors_t)(void);
+typedef struct {
+    uint32_t word0;
+    uint32_t word1;
+    uint32_t word2;
+    uint32_t word3;
+    uint32_t word4;
+} PicobinBlockItem;
+
+/* Extern Variables */
+extern unsigned int __stack_end__;
+
+/* Vector Table */
+__attribute__( ( used, section( ".vector_table" ) ) ) vectors_t vectorTable[] =
+{
+  (vectors_t)(&__stack_end__), // Initial SP
+  Reset_Handler,               // Reset
+  Default_Handler,             // NMI
+  Default_Handler,             // HardFault
+  Default_Handler,             // MemManage
+  Default_Handler,             // BusFaults
+  Default_Handler,             // UsageFault
+  0,                           // Reserved
+  0,                           // Reserved
+  0,                           // Reserved
+  0,                           // Reserved.
+  Default_Handler,             // SVCall
+  Default_Handler,             // DebugMonitor
+  0,                           // Reserved
+  Default_Handler,             // PendSV
+  Default_Handler,             // SysTick
+  Default_Handler,             // IRQ0
+  Default_Handler,             // IRQ1 ...
+};
+
+/* RP2350 Spec - 5.9.5. Minimum Viable Image Metadata
+   As we want to work with ARM Arch, then we use the Minimum Arm IMAGE_DEF
+*/
+PicobinBlockItem picoBinBlockItem __attribute__((section(".picobin_block_item"))) = {
+    .word0 = 0xffffded3,    // PICOBIN_BLOCK_MARKER_START (4 byte magic header)
+    .word1 = 0x10210142,    // 0x42 PICOBIN_BLOCK_ITEM_1BS_IMAGE_TYPE, 0x01 word in size, 0x1021 image type exe secure, ARM, RP2350
+    .word2 = 0x000001ff,    // 0x00 pad, 0x0001 size, 0xff(size_type == 1, item_type_ == PICOBIN_BLOCK_ITEM_2BS_LAST)
+    .word3 = 0x00000000,    // loop containing just this block
+    .word4 = 0xab123579,    // PICOBIN_BLOCK_MARKER_END (4 byte magic footer)
+};
+
+void Default_Handler(void)
+{
+  while (1)
+  {
+    asm("nop");
+  }
+}
+
+void Reset_Handler(void)
+{
+  uint32_t cpuId = GET32(0xd0000000);
+  if (cpuId == 1)
+  {
+    // Hold Core1 on infinite loop
+    while(1)
+    {
+        asm("nop");
+    }
+  }
+  main();
+}
+
 /* Delay Function
    5 instructions are needed to do a loop. Therefore:
-   5 loops @ 12MHz = 2398 clock cycles per ms. */
-void delay(unsigned int millisec)
+   5 loops @ 12MHz = 2398 clock cycles per ms.
+*/
+void delay(uint32_t millisec)
 {
-    for(unsigned int i = 0; i < millisec * 2398; i++)
+    for(uint32_t i = 0; i < millisec * 2398; i++)
     {
         asm("nop");
     }
 }
 
 /* ConfigDevice Function
-   Configures the clock and GPIO */
+   Configures the clock and GPIO
+*/
 void configDevice(void)
 {
-
     // Setup XOC clock to drive the GPIO (Pico2 board as a ABM8-272-T3 crystal that oscillates at 12MHz)
     PUT32((0x40048000 + 0),      0x00000aa0);               //  XOC range 1-15MHz (Crystal Oschillator)
     PUT32((0x40048000 + 0x0c),   0x000000c4);               //  Startup Delay (default = 50,000 cycles aprox.)
@@ -69,18 +148,21 @@ void configDevice(void)
     PUT32((0x40070000 + 0x30), ((   1 << 9 ) | ( 1 << 8 ) | ( 1 << 0 )));  // UARTCR: UART Enabled, Tx enabled, Rx enabled
 }
 
+
 /* Transmits Character over UART
-   Writes a character on the UART TX FIFO */
-void uartTxChar(unsigned char txData)
+   Writes a character on the UART TX FIFO
+*/
+void uartTxChar(int8_t txData)
 {
-    volatile unsigned char myData = txData;
+    volatile int8_t myData = txData;
     while(GET32(0x40070000 + 0x018) & (1 << 5));        // Wait until UART0 FIFO is empty
     PUT32((0x40070000 + 0x0), myData);                  // UARTDR: Write data to Tx.
 }
 
 /* Transmits string over UART
-   Writes a character on the UART TX FIFO */
-void uartTxString(unsigned char* txData)
+   Writes a character on the UART TX FIFO
+*/
+void uartTxString(int8_t* txData)
 {
     while(*txData != '\0')
     {
@@ -90,43 +172,44 @@ void uartTxString(unsigned char* txData)
     uartTxChar('\n');
 }
 
-/* Indicates when data is avaiable on UART Rx FIFO */
-inline int uartRxDataAvail(void)
+/* Indicates when data is avaiable on UART Rx FIFO 
+*/
+int uartRxDataAvail(void)
 {
     return ((GET32(0x40070000 + 0x018) & (1 << 4)) == 0);   // Wait until UART0 FIFO is no empty
 }
 
-/* Receives character over UART */
-char uartRxChar(void)
+/* Receives character over UART
+*/
+uint8_t uartRxChar(void)
 {
     while(uartRxDataAvail() == 0);                          // Wait until UART0 Rx data is available
     return((unsigned char)GET32(0x40070000 + 0x0));         // UARTDR: Write data to Tx.
 }
 
-/* Main Function
-   send text on UART0, toggle LED after each line
-   and each received character is send back*/
-int main() {
+/* -------------
+   Main Function
+   -------------
+*/
+int main( void ){
     configDevice();
     delay(1000);
-    uartTxString("-= UART Blocking Example for RP2350 =-\n\n");
-
+    uartTxString((int8_t*)"-= UART Blocking Example for RP2350 =-\n\n");
     while(1)
     {
         unsigned char i = '0';
-        unsigned char textString[] = "[ ] Hola Mundo!";
+        int8_t textString[] = "[ ] Hola Mundo!";
         while(i <= 'Z')
         {
             textString[1] = i++;
             uartTxString(textString);
             PUT32((0xd0000000 + WRITE_SET + 0x028), (1 << 25));    // xor GPIO (toggle pin)
-            delay(400);
+            delay(100);
             if (uartRxDataAvail() != 0)
             {
-                uartTxChar(uartRxChar());    // Transmit each received character
+              uartTxChar(uartRxChar());    // Transmit each received character
             }
         }
     }
     return 0;
 }
-

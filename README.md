@@ -50,7 +50,7 @@ git submodule update --init
 cd ..
 git clone -b master https://github.com/raspberrypi/pico-examples.git
 ```
-## Build the picotool to generate the .uf2 files
+## Build the picotool to flash and to generate the .uf2 files
 The .uf2 files are files used to flash the Pico board when it is mounted as hard drive on the PC. The .uf2 file is generated out of the .elf file.
 Previously, the ELF-to-UF2 conversion was handled by the elf2uf2 tool in the SDK. Now, for the Pico2 board, the SDK also uses picotool to hash and sign binaries.
 
@@ -62,6 +62,12 @@ mkdir build
 cd build
 cmake ..
 make -j
+```
+
+## Biuld the openocd with support for RP2350/RP2040 
+Follow the instructions on:
+```
+https://github.com/raspberrypi/openocd
 ```
 
 ## Clone the *RPi-Pico2-Baremetal* repository

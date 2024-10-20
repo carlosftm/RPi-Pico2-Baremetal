@@ -1,0 +1,114 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x0000000010000000 0x0000000000400000 xr
+RAM              0x0000000020000000 0x0000000000080000 xrw
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+LOAD 02_BlockingUART.o
+                0x0000000000000800                HEAP_SIZE = 0x800
+                0x0000000000000400                STACK_SIZE = 0x400
+
+.text           0x0000000010000000      0x32c
+                0x0000000010000000                . = ALIGN (0x4)
+ *(.vector_table)
+ .vector_table  0x0000000010000000       0x48 02_BlockingUART.o
+                0x0000000010000000                vectorTable
+ *(.picobin_block_item)
+ .picobin_block_item
+                0x0000000010000048       0x14 02_BlockingUART.o
+                0x0000000010000048                picoBinBlockItem
+ *(.text)
+ .text          0x000000001000005c      0x294 02_BlockingUART.o
+                0x000000001000005c                Default_Handler
+                0x0000000010000064                Reset_Handler
+                0x0000000010000088                delay
+                0x00000000100000ba                configDevice
+                0x00000000100001c0                uartTxChar
+                0x00000000100001f8                uartTxString
+                0x0000000010000230                uartRxDataAvail
+                0x0000000010000254                uartRxChar
+                0x0000000010000274                main
+ *(.text*)
+ *(.rodata)
+ .rodata        0x00000000100002f0       0x3c 02_BlockingUART.o
+ *(.rodata*)
+ *(.glue_7)
+ .glue_7        0x000000001000032c        0x0 linker stubs
+ *(.glue_7t)
+ .glue_7t       0x000000001000032c        0x0 linker stubs
+ *(.eh_frame)
+
+.data           0x000000001000032c        0x0
+ .data          0x000000001000032c        0x0 02_BlockingUART.o
+
+.igot.plt       0x000000001000032c        0x0
+ .igot.plt      0x000000001000032c        0x0 02_BlockingUART.o
+
+.vfp11_veneer   0x000000001000032c        0x0
+ .vfp11_veneer  0x000000001000032c        0x0 linker stubs
+
+.v4_bx          0x000000001000032c        0x0
+ .v4_bx         0x000000001000032c        0x0 linker stubs
+
+.iplt           0x000000001000032c        0x0
+ .iplt          0x000000001000032c        0x0 02_BlockingUART.o
+
+.rel.dyn        0x000000001000032c        0x0
+ .rel.iplt      0x000000001000032c        0x0 02_BlockingUART.o
+
+.bss            0x0000000020000000        0x0
+                0x0000000020000000                __bss_start__ = .
+ *(.bss)
+ .bss           0x0000000020000000        0x0 02_BlockingUART.o
+ *(.bss*)
+ *(COMMON)
+                0x0000000020000000                __bss_end__ = .
+
+.stack          0x0000000020000000      0x400
+                0x0000000020000000                . = ALIGN (0x8)
+                0x0000000020000000                __stack_start__ = .
+                0x0000000020000400                . = (. + STACK_SIZE)
+ *fill*         0x0000000020000000      0x400 
+                0x0000000020000400                __stack_end__ = .
+
+.heap           0x0000000020000400      0x800
+                0x0000000020000400                __heap_start__ = .
+                0x0000000020000c00                . = (. + HEAP_SIZE)
+ *fill*         0x0000000020000400      0x800 
+                0x0000000020000c00                __heap_end__ = .
+                0x0000000020000c00                _end = .
+OUTPUT(02_BlockingUART.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x0000000000000000      0x2a4
+ .debug_info    0x0000000000000000      0x2a4 02_BlockingUART.o
+
+.debug_abbrev   0x0000000000000000      0x18c
+ .debug_abbrev  0x0000000000000000      0x18c 02_BlockingUART.o
+
+.debug_aranges  0x0000000000000000       0x20
+ .debug_aranges
+                0x0000000000000000       0x20 02_BlockingUART.o
+
+.debug_line     0x0000000000000000      0x19b
+ .debug_line    0x0000000000000000      0x19b 02_BlockingUART.o
+
+.debug_str      0x0000000000000000      0x22a
+ .debug_str     0x0000000000000000      0x22a 02_BlockingUART.o
+                                        0x265 (size before relaxing)
+
+.comment        0x0000000000000000       0x33
+ .comment       0x0000000000000000       0x33 02_BlockingUART.o
+                                         0x34 (size before relaxing)
+
+.ARM.attributes
+                0x0000000000000000       0x34
+ .ARM.attributes
+                0x0000000000000000       0x34 02_BlockingUART.o
+
+.debug_frame    0x0000000000000000      0x13c
+ .debug_frame   0x0000000000000000      0x13c 02_BlockingUART.o
