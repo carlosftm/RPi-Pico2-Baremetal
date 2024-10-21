@@ -86,9 +86,7 @@ make -j
 
 or get a binary release from:
 
-```
 [https://github.com/raspberrypi/pico-sdk-tools](https://github.com/raspberrypi/pico-sdk-tools)
-```
 
 ## Clone the *RPi-Pico2-Baremetal* repository
 ```
