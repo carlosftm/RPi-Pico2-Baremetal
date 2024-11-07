@@ -1,17 +1,6 @@
-# 02_BlockingUART
-This example demonstrates how to configure the UART (Universal Asynchronous Receiver/Transmitter) on the RP2350 microcontroller by directly writing to its registers. 
-UART is crucial for debugging purposes because it allows developers to send and receive data between the microcontroller and a computer or other devices.
-This example uses the UART in blocking mode with FIFO enabled. That means, the microcontroller uses a FIFO to read and write data, but in case the FIFO is full, then the microcontroller needs to wait for the status flags, blocking the microcontroller for other taks.
-
-The UART0 is configured at 115200 bauds, 8 bits, parity none, 1 stop bit, no control flow. The GPIOs used are GPIO0 and GPIO1.
-
-Pay atention to the pad configuration in the RP2350. This is an imrpovement compared to the RP2040. Each GPIO pad needs to be enabled, and in the case of UART_RX GPIO, the pad has to be enabled for input explicitly (default is output enabled).
-
-As serial monitor, I used minicom (Linux) as follow:
-
-```
-minicom -D /dev/ttyACM0 -b 115200
-```
+# 03_MultiCore
+With this example, we will learn how to launch code on processor Core 1 (See chapter 5.3 of RP2350 Datasheet).The process to get Core 1 up and running requieres that Core 0 sends to Core 1 a series of values over SIO FIFO for intercore communication. The values include the vector table, stack pointer and the address of the entry function for Core 1.
+In this example, Core 0 does the necesary hardware initialization to get the clocks configured, as well as the onboard LED and the UART port. Then it takes Core 1 out of reset and then does necesary procedures to get it operational. Once is all initialization compleated, Core 0 sends and receives data over UART, while Core 1 controls the onboard LED.
 
 ## Build instructions
 
@@ -25,7 +14,7 @@ To compile this example, we can now do it without the SDK. The `MakeFile` contai
 ```
 clone the project: git clone https://github.com/carlosftm/RPi-Pico2-Baremetal.git
 cd RPi-Pico2-Baremetal
-cd 02_BlockingUART
+cd 03_MultiCore
 ```
 2. Build the project to generate an .elf and .uf2 file
 ```
@@ -54,5 +43,5 @@ make all
     or
 
     ```
-    cp 02_BlockingUART.uf2 /media/username/RP2350
+    cp 03_MultiCore.uf2 /media/username/RP2350
     ```
